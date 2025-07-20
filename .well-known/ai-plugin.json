@@ -1,0 +1,17 @@
+{
+    "schema_version": "v1",
+    "name_for_model": "naver_search",
+    "name_for_human": "NAVER Search",
+    "description_for_model": "Search Korean content using NAVER APIs including news, blogs, images, shopping, local businesses, and knowledge content. Useful for finding Korean-language information, news articles, blog posts, products, and local business information in South Korea.",
+    "description_for_human": "Search NAVER for Korean news, blogs, images, products, and local information.",
+    "auth": {
+          "type": "none"
+    },
+    "api": {
+          "type": "openapi",
+          "url": "https://naver-search-chatgpt-plugin.onrender.com/openapi.json"
+    },
+    "logo_url": "https://naver-search-chatgpt-plugin.onrender.com/static/logo.png",
+    "contact_email": "emanuel@theambitions.ai",
+    "legal_info_url": "https://theambitions.ai/legal"
+}
