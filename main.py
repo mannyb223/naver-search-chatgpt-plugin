@@ -12,7 +12,6 @@ app = FastAPI(
     version="v1"
 )
 
-# Add CORS middleware for ChatGPT plugin compatibility
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://chat.openai.com", "https://chatgpt.com"],
@@ -21,7 +20,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# NAVER API credentials from environment variables
 NAVER_CLIENT_ID = os.getenv("NAVER_CLIENT_ID", "TNnFZOpYxiuA0iJECR_i")
 NAVER_CLIENT_SECRET = os.getenv("NAVER_CLIENT_SECRET", "78KFaJGKaq")
 
@@ -30,32 +28,24 @@ headers = {
     "X-Naver-Client-Secret": NAVER_CLIENT_SECRET
 }
 
-# Serve static files for plugin configuration
 try:
     app.mount("/.well-known", StaticFiles(directory=".well-known"), name="static")
 except Exception:
-    pass  # Directory might not exist during development
+    pass
 
 @app.get("/")
 async def root():
     return {"message": "NAVER Search ChatGPT Plugin is running"}
 
-@app.get("/news")
+@app.get("/search/news")
 async def search_news(
-    query: str = Query(..., description="Search keywords"),
-    display: int = Query(10, ge=1, le=100, description="Number of results to display"),
-    start: int = Query(1, ge=1, le=1000, description="Index of the first result to return"),
-    sort: str = Query("sim", regex="^(sim|date)$", description="Sort order of results")
+    query: str = Query(...),
+    display: int = Query(10, ge=1, le=100),
+    start: int = Query(1, ge=1, le=1000),
+    sort: str = Query("sim", regex="^(sim|date)$")
 ):
-    """Search for news articles based on the query."""
     url = "https://openapi.naver.com/v1/search/news.json"
-    params = {
-        "query": query,
-        "display": display,
-        "start": start,
-        "sort": sort
-    }
-
+    params = {"query": query, "display": display, "start": start, "sort": sort}
     try:
         response = requests.get(url, headers=headers, params=params)
         response.raise_for_status()
@@ -63,22 +53,15 @@ async def search_news(
     except requests.RequestException as e:
         raise HTTPException(status_code=500, detail=f"NAVER API error: {str(e)}")
 
-@app.get("/blog")
+@app.get("/search/blog")
 async def search_blog(
-    query: str = Query(..., description="Search keywords"),
-    display: int = Query(10, ge=1, le=100, description="Number of results to display"),
-    start: int = Query(1, ge=1, le=1000, description="Index of the first result to return"),
-    sort: str = Query("sim", regex="^(sim|date)$", description="Sort order of results")
+    query: str = Query(...),
+    display: int = Query(10, ge=1, le=100),
+    start: int = Query(1, ge=1, le=1000),
+    sort: str = Query("sim", regex="^(sim|date)$")
 ):
-    """Search for blog posts based on the query."""
     url = "https://openapi.naver.com/v1/search/blog.json"
-    params = {
-        "query": query,
-        "display": display,
-        "start": start,
-        "sort": sort
-    }
-
+    params = {"query": query, "display": display, "start": start, "sort": sort}
     try:
         response = requests.get(url, headers=headers, params=params)
         response.raise_for_status()
@@ -86,24 +69,16 @@ async def search_blog(
     except requests.RequestException as e:
         raise HTTPException(status_code=500, detail=f"NAVER API error: {str(e)}")
 
-@app.get("/image")
+@app.get("/search/image")
 async def search_image(
-    query: str = Query(..., description="Search keywords"),
-    display: int = Query(10, ge=1, le=100, description="Number of results to display"),
-    start: int = Query(1, ge=1, le=1000, description="Index of the first result to return"),
-    sort: str = Query("sim", regex="^(sim|date)$", description="Sort order of results"),
-    filter: str = Query("all", regex="^(all|large|medium|small)$", description="Filter by size")
+    query: str = Query(...),
+    display: int = Query(10, ge=1, le=100),
+    start: int = Query(1, ge=1, le=1000),
+    sort: str = Query("sim", regex="^(sim|date)$"),
+    filter: str = Query("all", regex="^(all|large|medium|small)$")
 ):
-    """Search for images based on the query."""
     url = "https://openapi.naver.com/v1/search/image"
-    params = {
-        "query": query,
-        "display": display,
-        "start": start,
-        "sort": sort,
-        "filter": filter
-    }
-
+    params = {"query": query, "display": display, "start": start, "sort": sort, "filter": filter}
     try:
         response = requests.get(url, headers=headers, params=params)
         response.raise_for_status()
@@ -111,29 +86,21 @@ async def search_image(
     except requests.RequestException as e:
         raise HTTPException(status_code=500, detail=f"NAVER API error: {str(e)}")
 
-@app.get("/shop")
+@app.get("/search/shop")
 async def search_shop(
-    query: str = Query(..., description="Search keywords"),
-    display: int = Query(10, ge=1, le=100, description="Number of results to display"),
-    start: int = Query(1, ge=1, le=1000, description="Index of the first result to return"),
-    sort: str = Query("sim", regex="^(sim|date|asc|dsc)$", description="Sort order of results"),
-    filter: Optional[str] = Query(None, description="Type of products to include"),
-    exclude: Optional[str] = Query(None, description="Type of products to exclude")
+    query: str = Query(...),
+    display: int = Query(10, ge=1, le=100),
+    start: int = Query(1, ge=1, le=1000),
+    sort: str = Query("sim", regex="^(sim|date|asc|dsc)$"),
+    filter: Optional[str] = Query(None),
+    exclude: Optional[str] = Query(None)
 ):
-    """Search for products based on the query."""
     url = "https://openapi.naver.com/v1/search/shop.json"
-    params = {
-        "query": query,
-        "display": display,
-        "start": start,
-        "sort": sort
-    }
-
+    params = {"query": query, "display": display, "start": start, "sort": sort}
     if filter:
         params["filter"] = filter
     if exclude:
         params["exclude"] = exclude
-
     try:
         response = requests.get(url, headers=headers, params=params)
         response.raise_for_status()
@@ -141,22 +108,15 @@ async def search_shop(
     except requests.RequestException as e:
         raise HTTPException(status_code=500, detail=f"NAVER API error: {str(e)}")
 
-@app.get("/kin")
+@app.get("/search/kin")
 async def search_kin(
-    query: str = Query(..., description="Search keywords"),
-    display: int = Query(10, ge=1, le=100, description="Number of results to display"),
-    start: int = Query(1, ge=1, le=1000, description="Index of the first result to return"),
-    sort: str = Query("sim", regex="^(sim|date|point)$", description="Sort order of results")
+    query: str = Query(...),
+    display: int = Query(10, ge=1, le=100),
+    start: int = Query(1, ge=1, le=1000),
+    sort: str = Query("sim", regex="^(sim|date|point)$")
 ):
-    """Search for knowledge content based on the query."""
     url = "https://openapi.naver.com/v1/search/kin.json"
-    params = {
-        "query": query,
-        "display": display,
-        "start": start,
-        "sort": sort
-    }
-
+    params = {"query": query, "display": display, "start": start, "sort": sort}
     try:
         response = requests.get(url, headers=headers, params=params)
         response.raise_for_status()
@@ -164,22 +124,15 @@ async def search_kin(
     except requests.RequestException as e:
         raise HTTPException(status_code=500, detail=f"NAVER API error: {str(e)}")
 
-@app.get("/local")
+@app.get("/search/local")
 async def search_local(
-    query: str = Query(..., description="Search keywords"),
-    display: int = Query(1, ge=1, le=5, description="Number of results to display"),
-    start: int = Query(1, ge=1, le=1, description="Index of the first result to return"),
-    sort: str = Query("random", regex="^(random|comment)$", description="Sort order of results")
+    query: str = Query(...),
+    display: int = Query(1, ge=1, le=5),
+    start: int = Query(1, ge=1, le=1),
+    sort: str = Query("random", regex="^(random|comment)$")
 ):
-    """Search for local business information based on the query."""
     url = "https://openapi.naver.com/v1/search/local.json"
-    params = {
-        "query": query,
-        "display": display,
-        "start": start,
-        "sort": sort
-    }
-
+    params = {"query": query, "display": display, "start": start, "sort": sort}
     try:
         response = requests.get(url, headers=headers, params=params)
         response.raise_for_status()
@@ -187,7 +140,6 @@ async def search_local(
     except requests.RequestException as e:
         raise HTTPException(status_code=500, detail=f"NAVER API error: {str(e)}")
 
-# Health check endpoint
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "service": "NAVER Search Plugin"}
