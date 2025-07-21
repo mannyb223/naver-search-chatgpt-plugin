@@ -21,9 +21,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# NAVER API credentials
-NAVER_CLIENT_ID = "TNnFZOpYxiuA0iJECR_i"
-NAVER_CLIENT_SECRET = "78KFaJGKaq"
+# NAVER API credentials from environment variables
+NAVER_CLIENT_ID = os.getenv("NAVER_CLIENT_ID", "TNnFZOpYxiuA0iJECR_i")
+NAVER_CLIENT_SECRET = os.getenv("NAVER_CLIENT_SECRET", "78KFaJGKaq")
 
 headers = {
     "X-Naver-Client-Id": NAVER_CLIENT_ID,
